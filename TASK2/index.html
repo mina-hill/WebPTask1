@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auto Random Movement</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: #f2f2f2; 
+    }
+
+    .outer {
+      width: 200px;
+      height: 200px;
+      border: 2px solid #777;
+      background-color: #ffffff; 
+      position: relative;
+    }
+
+    .inner {
+      padding: 15px;
+      border: 1px solid #444;
+      background-color: #e6ecff; 
+      position: absolute;
+
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      transition: all 0.4s;
+    }
+
+    .count {
+      font-size: 18px;
+      text-align: center;
+      color: #333;
+    }
+
+    button {
+      margin: 10px;
+      padding: 6px 12px;
+      border: 1px solid #555;
+      background-color: #fafafa;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #eaeaea; /* tiny hover feedback */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="outer" id="outer">
+    <div class="inner" id="inner">
+      <div id="count" class="count">0</div>
+    </div>
+  </div>
+
+  <button onclick="start()">Start</button>
+
+  <script>
+    let count = 0;
+    let intervalId = null;
+
+    function start() {
+      if (intervalId !== null) return;
+
+      const outer = document.getElementById("outer");
+      const inner = document.getElementById("inner");
+
+      inner.style.transform = "none";
+
+      intervalId = setInterval(() => {
+        count++;
+        document.getElementById("count").innerText = count;
+
+        const maxX = outer.clientWidth - inner.offsetWidth;
+        const maxY = outer.clientHeight - inner.offsetHeight;
+
+        const randomX = Math.random() * maxX;
+        const randomY = Math.random() * maxY;
+
+        inner.style.left = randomX + "px";
+        inner.style.top = randomY + "px";
+      }, 500);
+    }
+  </script>
+
+</body>
+</html>
