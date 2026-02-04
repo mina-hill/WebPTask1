@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar Visions - Virtual Astronomy Art Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1b3d 50%, #2d1b4e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        /* Navbar Styles */
+        nav {
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.3);
+            border-bottom: 2px solid rgba(138, 43, 226, 0.5);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #8a2be2, #da70d6, #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #8a2be2, #da70d6);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #da70d6;
+            text-shadow: 0 0 10px rgba(218, 112, 214, 0.6);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 6rem 2rem;
+            background: radial-gradient(ellipse at center, rgba(138, 43, 226, 0.2) 0%, transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #da70d6, #8a2be2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+            }
+            to {
+                text-shadow: 0 0 40px rgba(218, 112, 214, 0.8);
+            }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #b8b8d1;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Section Styles */
+        section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #fff;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #8a2be2, transparent);
+        }
+
+        /* Gallery Styles */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            aspect-ratio: 4/3;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover {
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.8), 0 0 60px rgba(218, 112, 214, 0.5);
+            transform: translateY(-10px);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.15);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(10, 14, 39, 0.95), transparent);
+            padding: 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+        }
+
+        .gallery-overlay h3 {
+            color: #fff;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .gallery-overlay p {
+            color: #b8b8d1;
+            font-size: 0.95rem;
+        }
+
+        /* About Section */
+        .about-content {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+            background: rgba(26, 27, 61, 0.5);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-text h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #da70d6;
+        }
+
+        .about-text p {
+            margin-bottom: 1rem;
+            color: #b8b8d1;
+            font-size: 1.1rem;
+        }
+
+        .about-image {
+            flex: 1;
+            text-align: center;
+            font-size: 8rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Forms Section */
+        .forms-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .form-card {
+            background: rgba(26, 27, 61, 0.6);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(138, 43, 226, 0.4);
+            border-color: rgba(138, 43, 226, 0.7);
+        }
+
+        .form-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b8b8d1;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: rgba(10, 14, 39, 0.7);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #8a2be2;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+            background: rgba(10, 14, 39, 0.9);
+        }
+
+        .form-group input:hover,
+        .form-group textarea:hover {
+            border-color: rgba(138, 43, 226, 0.6);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #8a2be2, #da70d6);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.6);
+            background: linear-gradient(135deg, #9a3bf2, #ea80e6);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(10, 14, 39, 0.95);
+            padding: 2rem;
+            text-align: center;
+            border-top: 2px solid rgba(138, 43, 226, 0.5);
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-divider {
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8a2be2, #da70d6, #8a2be2, transparent);
+            margin: 1.5rem auto;
+        }
+
+        footer p {
+            color: #b8b8d1;
+            font-size: 1rem;
+        }
+
+        .footer-stars {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .nav-right {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .about-content {
+                flex-direction: column;
+                padding: 2rem;
+            }
+
+            .about-image {
+                font-size: 5rem;
+            }
+
+            .forms-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .form-card {
+                padding: 2rem;
+            }
+
+            section {
+                padding: 3rem 1rem;
+            }
+
+            nav {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .nav-links a {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">✨ Stellar Visions</div>
+            <ul class="nav-links">
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#feedback">Feedback</a></li>
+            </ul>
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="#signup">Sign Up</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Stellar Visions</h1>
+        <p>Explore the cosmos through stunning astronomical artistry. A journey beyond the stars awaits.</p>
+    </div>
+
+    <!-- Gallery Section -->
+    <section id="gallery">
+        <h2 class="section-title">Cosmic Gallery</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="image1.jpg" alt="Astronomy Art 1">
+                <div class="gallery-overlay">
+                    <h3>Astronomy Art 1</h3>
+                    <p>Capturing the beauty of the cosmos</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="image5.jpg" alt="Cosmic Art">
+                <div class="gallery-overlay">
+                    <h3>Cosmic Art</h3>
+                    <p>A stunning view of celestial wonders</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="image6.jpg" alt="Astronomy Art 2">
+                <div class="gallery-overlay">
+                    <h3>Astronomy Art 2</h3>
+                    <p>Exploring the depths of space</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="image4.jpg" alt="Space Art">
+                <div class="gallery-overlay">
+                    <h3>Space Art</h3>
+                    <p>The infinite beauty of the universe</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2 class="section-title">About Stellar Visions</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <h3>Journey Through the Cosmos</h3>
+                <p>Stellar Visions is a curated virtual gallery dedicated to showcasing the breathtaking beauty of our universe. Through the lens of talented astrophotographers and space artists, we bring the wonders of the cosmos to your screen.</p>
+                <p>Each piece in our collection tells a story of stellar birth, galactic evolution, and the infinite mysteries that lie beyond our world. From distant nebulae to nearby planets, we celebrate the artistry found in astronomical imagery.</p>
+                <p>Join us in exploring the final frontier, one stunning image at a time.</p>
+            </div>
+            <div class="about-image">
+                🌌
+            </div>
+        </div>
+    </section>
+
+    <!-- Feedback and Sign Up Forms -->
+    <section id="feedback">
+        <h2 class="section-title">Connect With Us</h2>
+        <div class="forms-container">
+            <!-- Feedback Form -->
+            <div class="form-card">
+                <h3>💫 Share Feedback</h3>
+                <form>
+                    <div class="form-group">
+                        <label for="feedback-name">Name</label>
+                        <input type="text" id="feedback-name" name="name" placeholder="Your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedback-email">Email</label>
+                        <input type="email" id="feedback-email" name="email" placeholder="your.email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedback-message">Message</label>
+                        <textarea id="feedback-message" name="message" placeholder="Share your thoughts about our gallery..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Send Feedback</button>
+                </form>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div class="form-card" id="signup">
+                <h3>🚀 Join Our Community</h3>
+                <form>
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" name="name" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email Address</label>
+                        <input type="email" id="signup-email" name="email" placeholder="your.email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" name="password" placeholder="Create a password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-stars">✨ ⭐ 🌟 ✨ ⭐</div>
+            <div class="footer-divider"></div>
+            <p>&copy; 2026 Stellar Visions | Exploring the Universe, One Image at a Time</p>
+        </div>
+    </footer>
+</body>
+</html>
