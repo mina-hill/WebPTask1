@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archery Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .score-board, .timer {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98D8C8 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: crosshair;
+            border: 3px solid #667eea;
+        }
+
+        .bow {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 100px;
+            background: linear-gradient(to right, #8B4513, #A0522D);
+            border-radius: 30px 30px 5px 5px;
+            z-index: 10;
+        }
+
+        .bow::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 80px;
+            background: #654321;
+        }
+
+        .arrow {
+            position: absolute;
+            width: 8px;
+            height: 60px;
+            background: linear-gradient(to bottom, #FFD700 0%, #DAA520 10%, #8B4513 10%, #8B4513 100%);
+            border-radius: 2px;
+            display: none;
+            z-index: 5;
+        }
+
+        .arrow::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 15px solid #C0C0C0;
+        }
+
+        .target {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #FF0000 0%, #FF0000 25%, #FFFFFF 25%, #FFFFFF 50%, #0000FF 50%, #0000FF 75%, #FFFF00 75%, #FFFF00 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .target::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #000;
+            border-radius: 50%;
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            display: none;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+
+        .game-over h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+
+        .game-over p {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .difficulty-indicator {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .hit-effect {
+            animation: pulse 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .instructions {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <div class="score-board">Score: <span id="score">0</span></div>
+            <div class="timer">Time: <span id="time">60</span>s</div>
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="bow" id="bow"></div>
+            <div class="arrow" id="arrow"></div>
+            <div class="target" id="target"></div>
+            
+            <div class="game-over" id="gameOver">
+                <h2>Game Over!</h2>
+                <p>Final Score: <span id="finalScore">0</span></p>
+                <p>Accuracy: <span id="accuracy">0</span>%</p>
+            </div>
+        </div>
+        
+        <div class="difficulty-indicator" id="difficultyIndicator">
+            Difficulty: Easy
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-start" id="startBtn">Start Game</button>
+            <button class="btn btn-restart" id="restartBtn">Play Again</button>
+        </div>
+        
+        <div class="instructions">
+            Click anywhere in the game area to shoot arrows at the moving target!
+        </div>
+    </div>
+
+    <script>
+        // DOM Element Selection
+        const gameArea = document.querySelector('#gameArea');
+        const target = document.querySelector('#target');
+        const arrow = document.querySelector('#arrow');
+        const scoreDisplay = document.querySelector('#score');
+        const timeDisplay = document.querySelector('#time');
+        const startBtn = document.querySelector('#startBtn');
+        const restartBtn = document.querySelector('#restartBtn');
+        const gameOverScreen = document.querySelector('#gameOver');
+        const finalScoreDisplay = document.querySelector('#finalScore');
+        const accuracyDisplay = document.querySelector('#accuracy');
+        const difficultyIndicator = document.querySelector('#difficultyIndicator');
+
+        // Game State Variables
+        let score = 0;
+        let timeLeft = 60;
+        let gameActive = false;
+        let targetSpeed = 2;
+        let targetSize = 80;
+        let timerInterval = null;
+        let moveInterval = null;
+        let targetDirectionX = 1;
+        let targetDirectionY = 1;
+        let totalShots = 0;
+        let hits = 0;
+
+        // Target position variables
+        let targetX = 100;
+        let targetY = 100;
+
+        // Initialize game
+        const initializeGame = () => {
+            score = 0;
+            timeLeft = 60;
+            gameActive = false;
+            targetSpeed = 2;
+            targetSize = 80;
+            totalShots = 0;
+            hits = 0;
+            targetX = 100;
+            targetY = 100;
+            
+            updateScore();
+            updateTimer();
+            updateTargetStyle();
+            gameOverScreen.style.display = 'none';
+            target.style.left = targetX + 'px';
+            target.style.top = targetY + 'px';
+        };
+
+        // Start Game Function
+        const startGame = () => {
+            initializeGame();
+            gameActive = true;
+            startBtn.style.display = 'none';
+            restartBtn.style.display = 'none';
+            startTimer();
+            moveTarget();
+        };
+
+        // Timer Function
+        const startTimer = () => {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        };
+
+        // Update Timer Display
+        const updateTimer = () => {
+            timeDisplay.textContent = timeLeft;
+        };
+
+        // Move Target Function
+        const moveTarget = () => {
+            moveInterval = setInterval(() => {
+                if (!gameActive) return;
+
+                // Update position
+                targetX += targetSpeed * targetDirectionX;
+                targetY += targetSpeed * targetDirectionY;
+
+                // Boundary checking with size consideration
+                const maxX = gameArea.offsetWidth - targetSize;
+                const maxY = gameArea.offsetHeight - targetSize - 120; // Leave space for bow
+
+                if (targetX <= 0 || targetX >= maxX) {
+                    targetDirectionX *= -1;
+                    targetX = Math.max(0, Math.min(targetX, maxX));
+                }
+
+                if (targetY <= 0 || targetY >= maxY) {
+                    targetDirectionY *= -1;
+                    targetY = Math.max(0, Math.min(targetY, maxY));
+                }
+
+                // Apply new position
+                target.style.left = targetX + 'px';
+                target.style.top = targetY + 'px';
+            }, 20);
+        };
+
+        // Update Score Function
+        const updateScore = () => {
+            scoreDisplay.textContent = score;
+        };
+
+        // Increase Difficulty Function
+        const increaseDifficulty = () => {
+            if (score >= 5 && score < 10) {
+                targetSpeed = 3;
+                targetSize = 70;
+                difficultyIndicator.textContent = 'Difficulty: Medium';
+                difficultyIndicator.style.color = '#ff9800';
+            } else if (score >= 10 && score < 15) {
+                targetSpeed = 4;
+                targetSize = 60;
+                difficultyIndicator.textContent = 'Difficulty: Hard';
+                difficultyIndicator.style.color = '#f44336';
+            } else if (score >= 15) {
+                targetSpeed = 5;
+                targetSize = 50;
+                difficultyIndicator.textContent = 'Difficulty: Expert';
+                difficultyIndicator.style.color = '#9c27b0';
+            }
+            
+            updateTargetStyle();
+        };
+
+        // Update Target Style Function
+        const updateTargetStyle = () => {
+            target.style.width = targetSize + 'px';
+            target.style.height = targetSize + 'px';
+        };
+
+        // Shoot Arrow Function
+        const shootArrow = (clickX, clickY) => {
+            if (!gameActive) return;
+            
+            totalShots++;
+            
+            // Get bow position
+            const bowRect = gameArea.getBoundingClientRect();
+            const arrowStartX = gameArea.offsetWidth / 2;
+            const arrowStartY = gameArea.offsetHeight - 70;
+            
+            // Set arrow initial position
+            arrow.style.left = (arrowStartX - 4) + 'px';
+            arrow.style.bottom = '70px';
+            arrow.style.display = 'block';
+            
+            // Calculate direction
+            const gameAreaRect = gameArea.getBoundingClientRect();
+            const targetClickX = clickX - gameAreaRect.left;
+            const targetClickY = clickY - gameAreaRect.top;
+            
+            // Animate arrow
+            animateArrow(arrowStartX, arrowStartY, targetClickX, targetClickY);
+        };
+
+        // Animate Arrow Function
+        const animateArrow = (startX, startY, endX, endY) => {
+            const duration = 500; // milliseconds
+            const startTime = Date.now();
+            
+            const animate = () => {
+                const currentTime = Date.now();
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Calculate current position
+                const currentX = startX + (endX - startX) * progress;
+                const currentY = startY + (endY - startY) * progress;
+                
+                arrow.style.left = (currentX - 4) + 'px';
+                arrow.style.top = currentY + 'px';
+                
+                // Check collision
+                checkCollision(currentX, currentY);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Hide arrow after animation
+                    setTimeout(() => {
+                        arrow.style.display = 'none';
+                    }, 100);
+                }
+            };
+            
+            animate();
+        };
+
+        // Check Collision Function
+        const checkCollision = (arrowX, arrowY) => {
+            const targetRect = target.getBoundingClientRect();
+            const gameAreaRect = gameArea.getBoundingClientRect();
+            
+            const targetCenterX = targetX + targetSize / 2;
+            const targetCenterY = targetY + targetSize / 2;
+            
+            const distance = Math.sqrt(
+                Math.pow(arrowX - targetCenterX, 2) + 
+                Math.pow(arrowY - targetCenterY, 2)
+            );
+            
+            if (distance < targetSize / 2) {
+                hitTarget();
+            }
+        };
+
+        // Hit Target Function
+        const hitTarget = () => {
+            score++;
+            hits++;
+            updateScore();
+            increaseDifficulty();
+            
+            // Visual feedback
+            target.classList.add('hit-effect');
+            setTimeout(() => {
+                target.classList.remove('hit-effect');
+            }, 300);
+            
+            // Random position change on hit
+            targetX = Math.random() * (gameArea.offsetWidth - targetSize);
+            targetY = Math.random() * (gameArea.offsetHeight - targetSize - 120);
+        };
+
+        // End Game Function
+        const endGame = () => {
+            gameActive = false;
+            clearInterval(timerInterval);
+            clearInterval(moveInterval);
+            
+            // Calculate accuracy
+            const accuracy = totalShots > 0 ? Math.round((hits / totalShots) * 100) : 0;
+            
+            // Display game over screen
+            finalScoreDisplay.textContent = score;
+            accuracyDisplay.textContent = accuracy;
+            gameOverScreen.style.display = 'block';
+            restartBtn.style.display = 'inline-block';
+        };
+
+        // Reset Game Function
+        const resetGame = () => {
+            clearInterval(timerInterval);
+            clearInterval(moveInterval);
+            startGame();
+        };
+
+        // Event Listeners
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', resetGame);
+
+        // Game area click event
+        gameArea.addEventListener('click', (event) => {
+            // Prevent shooting when clicking on buttons or game over screen
+            if (event.target === startBtn || 
+                event.target === restartBtn || 
+                event.target.closest('.game-over')) {
+                return;
+            }
+            
+            shootArrow(event.clientX, event.clientY);
+        });
+
+        // Prevent event bubbling on target
+        target.addEventListener('click', (event) => {
+            event.stopPropagation();
+            shootArrow(event.clientX, event.clientY);
+        });
+
+        // Initialize on load
+        window.addEventListener('load', initializeGame);
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simple To-Do</title>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    ul {
+        padding-left: 0;
+    }
+
+    li {
+        list-style: none;
+        margin: 5px 0;
+    }
+
+    .done {
+        text-decoration: line-through;
+        color: gray;
+    }
+</style>
+</head>
+
+<body>
+
+<h3>To-Do List</h3>
+
+<input type="text" id="task" placeholder="Enter task">
+<button id="add">Add</button>
+
+<ul id="list"></ul>
+
+<script>
+$(document).ready(function () {
+
+    $("#add").click(function () {
+        let task = $("#task").val().trim();
+
+        if (task !== "") {
+            $("#list").append(`
+                <li>
+                    <input type="checkbox" class="check">
+                    <span class="text">${task}</span>
+                </li>
+            `);
+            $("#task").val("");
+        }
+    });
+
+    $(document).on("change", ".check", function () {
+        $(this).next(".text").toggleClass("done");
+    });
+
+});
+</script>
+
+</body>
+</html>

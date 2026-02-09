@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .todo-box {
+            background: #fff;
+            padding: 20px;
+            width: 320px;
+            border-radius: 8px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+        }
+
+        .add-btn {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            background: #eee;
+            padding: 6px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .task-text.done {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="todo-box">
+    <h3>To-Do List</h3>
+
+    <div class="input-area">
+        <input type="text" id="task" placeholder="Enter task">
+        <button class="add-btn">Add</button>
+    </div>
+
+    <ul id="list"></ul>
+</div>
+
+<script>
+$(document).ready(function () {
+
+    $(".add-btn").click(function () {
+        let task = $("#task").val().trim();
+
+        if (task !== "") {
+            $("#list").append(`
+                <li>
+                    <div class="left">
+                        <input type="checkbox" class="check">
+                        <span class="task-text">${task}</span>
+                    </div>
+                </li>
+            `);
+            $("#task").val("");
+        }
+    });
+
+    // Mark task as done
+    $(document).on("change", ".check", function () {
+        $(this).next(".task-text").toggleClass("done");
+    });
+
+});
+</script>
+
+</body>
+</html>

@@ -1,3 +1,8 @@
+<!--
+23i-0554 
+Minahil Kashif
+Web-C-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,20 +44,18 @@ body {
   width: 90px;
   height: 120px;
   background: url("bow.png") no-repeat center/contain;
-  transform: rotate(45deg);           /* rotate clockwise */
-  transform-origin: bottom left;      /* pivot point for natural rotation */
+  transform: rotate(45deg);
+  transform-origin: bottom left;
 }
 
 .arrow {
   position: absolute;
-  left: 110px;
-  bottom: 260px;
-  width: 240px;             /* bigger width */
-  height: 40px;             /* taller for visibility */
+  width: 240px;
+  height: 40px;
   background: url("arrow.png") no-repeat center/contain;
   display: none;
-  transform: rotate(45deg);           /* match bow angle */
-  transform-origin: left center;      /* pivot so arrow flies from tip */
+  transform: rotate(45deg);
+  transform-origin: left center;
 }
 
 .target {
@@ -71,12 +74,14 @@ body {
 <div class="game">
   <div class="info">
     Score: <span id="score">0</span> |
-    Time: <span id="time">30</span>s
+    Time: <span id="time">30</span>s |
+    Goal: <span id="goal">5</span>
     <button id="startBtn">Start</button>
+    <button id="restartBtn">Restart</button>
   </div>
 
   <div class="area" id="gameArea">
-    <div class="bow"></div>
+    <div class="bow" id="bow"></div>
     <div class="arrow" id="arrow"></div>
     <div class="target" id="target"></div>
   </div>
@@ -86,6 +91,7 @@ body {
 
 <script>
 // DOM elements
+const bow = document.querySelector("#bow");
 const target = document.querySelector("#target");
 const arrow = document.querySelector("#arrow");
 const scoreText = document.querySelector("#score");
@@ -94,6 +100,7 @@ const startBtn = document.querySelector("#startBtn");
 const message = document.querySelector("#message");
 const gameArea = document.querySelector("#gameArea");
 
+
 // Game state
 let score = 0;
 let timeLeft = 30;
@@ -101,6 +108,10 @@ let gameOver = false;
 let targetSpeed = 2;
 let timer;
 let targetMove;
+let bowSpeed = 10;
+let arrowActive = false;
+const goal = 5; // win goal
+document.querySelector("#goal").textContent = goal;
 
 // Move target up and down
 const moveTarget = () => {
@@ -108,48 +119,74 @@ const moveTarget = () => {
   targetMove = setInterval(() => {
     if (gameOver) return;
     let top = target.offsetTop;
-    // Use dynamic height limit
     if (top <= 0 || top >= gameArea.offsetHeight - target.offsetHeight) direction *= -1;
     target.style.top = top + direction * targetSpeed + "px";
   }, 20);
 };
 
-// Shoot arrow
 const shootArrow = () => {
-  if (gameOver) return;
+  if (gameOver || arrowActive) return;
 
+  arrowActive = true;
   arrow.style.display = "block";
-  let pos = 110; // start position inside bow
+
+  // Start arrow at bow's current position
+  let posX = bow.offsetLeft + bow.offsetWidth - 10;
+  let posY = bow.offsetTop + bow.offsetHeight / 2 - arrow.offsetHeight / 2;
+  arrow.style.left = posX + "px";
+  arrow.style.top = posY + "px";
 
   const shoot = setInterval(() => {
-    pos += 10;
-    arrow.style.left = pos + "px";
+    posX += 5; // smaller step for smoother animation
+    arrow.style.left = posX + "px"; // update DOM immediately
+    arrow.style.top = posY + "px";  // keep Y fixed
 
+    // Collision check after moving arrow visually
     if (checkHit()) {
       updateScore();
       clearInterval(shoot);
       resetArrow();
+      return;
     }
 
-    if (pos > gameArea.offsetWidth) {
+    if (posX > gameArea.offsetWidth) {
       clearInterval(shoot);
       resetArrow();
     }
-  }, 30);
+  }, 16); // ~60fps for smooth animation
 };
 
-// Collision detection
+
+// Collision detection with tighter arrow hit area (only the tip counts)
 const checkHit = () => {
-  const a = arrow.getBoundingClientRect();
-  const t = target.getBoundingClientRect();
-  return !(a.right < t.left || a.left > t.right || a.bottom < t.top || a.top > t.bottom);
+  const arrowRect = arrow.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+
+  // Only check the front 20px of the arrow
+  const arrowTip = {
+    left: arrowRect.right - 20,
+    right: arrowRect.right,
+    top: arrowRect.top + 5,
+    bottom: arrowRect.bottom - 5
+  };
+
+  return !(
+    arrowTip.right < targetRect.left ||
+    arrowTip.left > targetRect.right ||
+    arrowTip.bottom < targetRect.top ||
+    arrowTip.top > targetRect.bottom
+  );
 };
 
-// Update score
+// Update score and check win
 const updateScore = () => {
   score++;
   scoreText.textContent = score;
   increaseDifficulty();
+
+  if (score >= goal) {
+    endGame(true); // player wins
+  }
 };
 
 // Increase difficulty
@@ -166,22 +203,23 @@ const startTimer = () => {
   timer = setInterval(() => {
     timeLeft--;
     timeText.textContent = timeLeft;
-    if (timeLeft === 0) endGame();
+    if (timeLeft === 0) endGame(false);
   }, 1000);
 };
 
 // End game
-const endGame = () => {
+const endGame = (win = false) => {
   gameOver = true;
   clearInterval(timer);
   clearInterval(targetMove);
-  message.textContent = "Game Over!";
+  arrowActive = false;
+  message.textContent = win ? "You Win!" : "Game Over!";
 };
 
 // Reset arrow
 const resetArrow = () => {
   arrow.style.display = "none";
-  arrow.style.left = "110px";
+  arrowActive = false;
 };
 
 // Start game
@@ -190,6 +228,7 @@ const startGame = () => {
   timeLeft = 30;
   gameOver = false;
   targetSpeed = 2;
+  arrowActive = false;
   scoreText.textContent = score;
   timeText.textContent = timeLeft;
   message.textContent = "";
@@ -197,8 +236,42 @@ const startGame = () => {
   startTimer();
 };
 
+// Bow movement
+document.addEventListener("keydown", (e) => {
+  if (gameOver) return;
+  let bowTop = bow.offsetTop;
+
+  if (e.key === "ArrowUp") {
+    bowTop -= bowSpeed;
+    if (bowTop < 0) bowTop = 0;
+    bow.style.top = bowTop + "px";
+  }
+  if (e.key === "ArrowDown") {
+    bowTop += bowSpeed;
+    if (bowTop > gameArea.offsetHeight - bow.offsetHeight) bowTop = gameArea.offsetHeight - bow.offsetHeight;
+    bow.style.top = bowTop + "px";
+  }
+});
+
+const restartBtn = document.querySelector("#restartBtn");
+
+// Restart game
+restartBtn.addEventListener("click", () => {
+  // Stop timers and arrow if active
+  clearInterval(timer);
+  clearInterval(targetMove);
+  arrowActive = false;
+  arrow.style.display = "none";
+
+  startGame();
+});
+
+
+// Shoot arrow only in game area
+gameArea.addEventListener("click", shootArrow);
+
+// Start button
 startBtn.addEventListener("click", startGame);
-document.addEventListener("click", shootArrow);
 </script>
 
 </body>
