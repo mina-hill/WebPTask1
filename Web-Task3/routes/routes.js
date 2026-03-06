@@ -1,15 +1,50 @@
+// routes.js
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    req.session.name = "hello";
-    req.session.ban = true;
-    res.send("Session data set.");
+const User = require('./User');
+
+// Authentication Middleware
+function authMiddleware(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    res.send('Access denied. Please login.');
+  }
+}
+
+// Register Route
+router.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const user = new User(username, password);
+  const message = await user.register();
+  res.send(message);
 });
 
-router.get('/sessions', (req, res) => {
-    console.log(req.session); 
-    res.send(`Session Data: ${JSON.stringify(req.session)}`);
+// Login Route
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = new User(username, password);
+  const foundUser = await user.login();
+
+  if (foundUser) {
+    req.session.user = username;
+    res.send('Login successful');
+  } else {
+    res.send('Invalid username or password');
+  }
+});
+
+// Dashboard Route (Protected)
+router.get('/dashboard', authMiddleware, (req, res) => {
+  res.send(`Welcome ${req.session.user}`);
+});
+
+// Logout Route
+router.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.send('Logout successful');
+  });
 });
 
 module.exports = router;
