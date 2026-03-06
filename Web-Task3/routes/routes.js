@@ -40,7 +40,7 @@ router.get('/dashboard', authMiddleware, (req, res) => {
   res.send(`Welcome ${req.session.user}`);
 });
 
-// Logout Route
+// Logout Route added wowww
 router.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.send('Logout successful');
