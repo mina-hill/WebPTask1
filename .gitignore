@@ -24,3 +24,10 @@ data/
 
 # Build outputs (if any)
 dist/
+
+# Archive files
+*.zip
+
+# Report documents
+*.docx
+*.doc
