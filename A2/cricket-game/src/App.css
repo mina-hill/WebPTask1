@@ -1,0 +1,315 @@
+/* ===== Global Reset ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #1a2a1a;
+  color: #fff;
+  min-height: 100vh;
+}
+
+/* ===== App Layout ===== */
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ===== Title ===== */
+.game-title {
+  text-align: center;
+  font-size: 28px;
+  color: #f6e05e;
+  text-shadow: 0 0 12px #c6a000;
+}
+
+/* ===== Scoreboard ===== */
+.scoreboard {
+  display: flex;
+  justify-content: space-around;
+  background: #1a3a1a;
+  border: 2px solid #4a7c3f;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.score-label {
+  font-size: 12px;
+  color: #9ae6b4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.score-value {
+  font-size: 26px;
+  font-weight: bold;
+  color: #f6e05e;
+}
+
+/* ===== Pitch ===== */
+.pitch-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid #4a7c3f;
+  transition: box-shadow 0.3s;
+}
+
+.pitch-svg {
+  width: 100%;
+  display: block;
+}
+
+/* Flash effects on result */
+.wicket-flash {
+  box-shadow: 0 0 20px 6px #e53e3e;
+}
+
+.boundary-flash {
+  box-shadow: 0 0 20px 6px #f6e05e;
+}
+
+/* Outcome overlay on pitch */
+.outcome-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.75);
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #f6e05e;
+  text-align: center;
+  animation: popIn 0.3s ease;
+}
+
+/* Game over overlay on pitch */
+.gameover-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.gameover-overlay h2 {
+  font-size: 32px;
+  color: #f6e05e;
+}
+
+.gameover-overlay p {
+  font-size: 18px;
+  color: #9ae6b4;
+}
+
+@keyframes popIn {
+  from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+}
+
+/* ===== Commentary ===== */
+.commentary {
+  background: #2d3748;
+  border-left: 4px solid #f6e05e;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 15px;
+  color: #e2e8f0;
+  min-height: 40px;
+}
+
+/* ===== Power Bar ===== */
+.powerbar-container {
+  background: #1a2a1a;
+  border: 2px solid #4a7c3f;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.powerbar-title {
+  font-size: 14px;
+  color: #9ae6b4;
+  margin-bottom: 8px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.powerbar-hint {
+  text-align: center;
+  color: #718096;
+  font-size: 13px;
+  padding: 10px;
+}
+
+.powerbar {
+  position: relative;
+  display: flex;
+  height: 48px;
+  border-radius: 8px;
+  overflow: visible;
+  border: 2px solid #333;
+}
+
+.powerbar-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  transition: filter 0.2s;
+}
+
+.powerbar-segment:hover {
+  filter: brightness(1.2);
+}
+
+.segment-label {
+  pointer-events: none;
+}
+
+/* Slider marker */
+.slider-marker {
+  position: absolute;
+  top: -10px;
+  width: 4px;
+  height: 68px;
+  background: white;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  box-shadow: 0 0 6px rgba(255,255,255,0.9);
+  pointer-events: none;
+  transition: left 0.016s linear;
+}
+
+/* Probability labels */
+.powerbar-labels {
+  display: flex;
+  margin-top: 6px;
+}
+
+.prob-label {
+  text-align: center;
+  font-size: 11px;
+  color: #a0aec0;
+}
+
+/* ===== Controls ===== */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.style-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Base button */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+button:active {
+  transform: scale(0.96);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Aggressive button */
+.style-btn.aggressive {
+  background: #c53030;
+  color: white;
+}
+
+.style-btn.aggressive.active {
+  background: #e53e3e;
+  box-shadow: 0 0 10px #e53e3e;
+}
+
+/* Defensive button */
+.style-btn.defensive {
+  background: #276749;
+  color: white;
+}
+
+.style-btn.defensive.active {
+  background: #38a169;
+  box-shadow: 0 0 10px #38a169;
+}
+
+/* Play Shot button */
+.play-btn {
+  background: #d69e2e;
+  color: #1a1a1a;
+  font-size: 17px;
+  padding: 12px 28px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(214,158,46,0.6); }
+  50%       { box-shadow: 0 0 0 8px rgba(214,158,46,0); }
+}
+
+/* Next ball button */
+.next-btn {
+  background: #2b6cb0;
+  color: white;
+  padding: 12px 24px;
+}
+
+/* Restart button */
+.restart-btn {
+  background: #4a5568;
+  color: white;
+  padding: 10px 18px;
+}
+
+/* ===== Instruction text ===== */
+.instruction {
+  text-align: center;
+  color: #a0aec0;
+  font-size: 14px;
+}
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 500px) {
+  .game-title { font-size: 20px; }
+  .score-value { font-size: 20px; }
+  .play-btn { font-size: 15px; padding: 10px 20px; }
+  .powerbar { height: 38px; }
+  .outcome-overlay { font-size: 20px; }
+}
