@@ -28,6 +28,6 @@ dist/
 # Archive files
 *.zip
 
-# Report documents
-*.docx
-*.doc
+# Submission folders
+TASK4-Submit-i230554/
+*-Submit/
